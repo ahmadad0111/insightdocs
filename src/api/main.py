@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.core.logging import logger
-from src.api.routes import health, query
+from src.api.routes import health, query, documents
 
 
 def create_app() -> FastAPI:
@@ -17,6 +17,7 @@ def create_app() -> FastAPI:
         allow_methods=["*"], allow_headers=["*"],
     )
     app.include_router(health.router)
+    app.include_router(documents.router)
     app.include_router(query.router)
 
     @app.on_event("startup")
