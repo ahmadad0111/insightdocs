@@ -14,7 +14,7 @@ services:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
-    profiles: ["ollama"]   # only starts when you run: docker compose --profile ollama up
+    profiles: ["ollama"]   # starts only with: docker compose --profile ollama up
 
   api:
     build: .
@@ -24,11 +24,19 @@ services:
     depends_on:
       - qdrant
     env_file:
-      - .env
+      - path: .env
+        required: false       # works without a .env; inline vars + code defaults apply
     environment:
       QDRANT_URL: http://qdrant:6333
       OLLAMA_URL: http://ollama:11434
       COLLECTION_NAME: insightdocs
+      LLM_PROVIDER: ollama
+      OLLAMA_MODEL: llama3
+    # give the model-loading container enough headroom (raise if it gets OOM-killed)
+    deploy:
+      resources:
+        limits:
+          memory: 6g
 
 volumes:
   qdrant_data:
