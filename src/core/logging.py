@@ -1,8 +1,18 @@
 import logging
+import sys
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
+_FORMAT = "%(asctime)s | %(levelname)-7s | %(name)s | %(message)s"
 
-logger = logging.getLogger("rag-system")
+
+def get_logger(name: str = "insightdocs") -> logging.Logger:
+    logger = logging.getLogger(name)
+    if not logger.handlers:
+        handler = logging.StreamHandler(sys.stdout)
+        handler.setFormatter(logging.Formatter(_FORMAT))
+        logger.addHandler(handler)
+        logger.setLevel(logging.INFO)
+        logger.propagate = False
+    return logger
+
+
+logger = get_logger()

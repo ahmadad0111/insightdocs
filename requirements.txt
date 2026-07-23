@@ -1,9 +1,20 @@
-langchain
-qdrant-client
-sentence-transformers
+# --- core RAG ---
 fastapi
-uvicorn
+uvicorn[standard]
+python-multipart
+pydantic
+
+# --- ingestion / embeddings / retrieval ---
 pymupdf
 langchain-text-splitters
-openai
-python-multipart
+sentence-transformers
+qdrant-client
+rank-bm25
+
+# --- LLM providers (install what you use) ---
+requests            # ollama
+openai              # openai provider
+anthropic           # anthropic provider
+
+# --- evaluation & dev ---
+pytest
