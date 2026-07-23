@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 660" font-family="Segoe UI, Inter, Arial, sans-serif">
+  <defs>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3 L0,6 Z" fill="#5b7099"/>
+    </marker>
+    <marker id="arp" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L7,3 L0,6 Z" fill="#7c5cff"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1120" height="660" rx="18" fill="#0b1120"/>
+  <text x="40" y="46" fill="#e8eefc" font-size="24" font-weight="700">InsightDocs — Agentic RAG Architecture</text>
+  <text x="40" y="70" fill="#8b9ac0" font-size="13">Hybrid retrieval · cross-encoder reranking · query routing &amp; decomposition · cited, streamed answers</text>
+
+  <!-- ============ INGESTION LANE ============ -->
+  <text x="40" y="104" fill="#68e1fd" font-size="12" font-weight="700" letter-spacing="1.5">1 · INGESTION  (offline)</text>
+
+  <g font-size="13.5" fill="#e8eefc" text-anchor="middle">
+    <rect x="40"  y="116" width="120" height="54" rx="10" fill="#111a2e" stroke="#1e2b45"/>
+    <text x="100" y="148">PDF document</text>
+    <rect x="196" y="116" width="120" height="54" rx="10" fill="#111a2e" stroke="#1e2b45"/>
+    <text x="256" y="141">Load &amp;</text><text x="256" y="157">clean</text>
+    <rect x="352" y="116" width="120" height="54" rx="10" fill="#111a2e" stroke="#1e2b45"/>
+    <text x="412" y="141">Chunk</text><text x="412" y="157">(overlap)</text>
+    <rect x="508" y="116" width="120" height="54" rx="10" fill="#111a2e" stroke="#1e2b45"/>
+    <text x="568" y="141">Embed</text><text x="568" y="157">(MiniLM)</text>
+    <rect x="672" y="112" width="168" height="62" rx="10" fill="#12203a" stroke="#2b6cb0"/>
+    <text x="756" y="137" fill="#9fc3ff" font-weight="700">Qdrant</text><text x="756" y="156" font-size="12" fill="#9fc3ff">vector store · per-doc metadata</text>
+  </g>
+  <g stroke="#5b7099" stroke-width="1.6" marker-end="url(#ar)" fill="none">
+    <path d="M160,143 L194,143"/>
+    <path d="M316,143 L350,143"/>
+    <path d="M472,143 L506,143"/>
+    <path d="M628,143 L670,143"/>
+  </g>
+
+  <line x1="40" y1="200" x2="1080" y2="200" stroke="#1e2b45" stroke-width="1"/>
+
+  <!-- ============ QUERY LANE ============ -->
+  <text x="40" y="230" fill="#7c5cff" font-size="12" font-weight="700" letter-spacing="1.5">2 · QUERY-TIME  (agentic)</text>
+
+  <g font-size="13.5" fill="#e8eefc" text-anchor="middle">
+    <!-- question + router -->
+    <rect x="40"  y="244" width="132" height="54" rx="10" fill="#111a2e" stroke="#1e2b45"/>
+    <text x="106" y="276">User question</text>
+    <rect x="208" y="244" width="132" height="54" rx="10" fill="#1a1633" stroke="#7c5cff"/>
+    <text x="274" y="270" fill="#c9bcff" font-weight="700">Router</text><text x="274" y="287" font-size="11.5" fill="#a99cf0">retrieve / direct</text>
+
+    <!-- direct branch -->
+    <rect x="384" y="238" width="220" height="46" rx="10" fill="#111a2e" stroke="#2f3b57"/>
+    <text x="494" y="266" font-size="12.5" fill="#b6c2d2">Direct answer (greeting / meta)</text>
+
+    <!-- decompose -->
+    <rect x="384" y="304" width="248" height="54" rx="10" fill="#1a1633" stroke="#7c5cff"/>
+    <text x="508" y="330" fill="#c9bcff" font-weight="700">Decompose</text><text x="508" y="347" font-size="11.5" fill="#a99cf0">complex Q → sub-questions</text>
+  </g>
+
+  <!-- router arrows -->
+  <path d="M172,271 L206,271" stroke="#5b7099" stroke-width="1.6" marker-end="url(#ar)" fill="none"/>
+  <path d="M340,262 L382,261" stroke="#7c5cff" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arp)" fill="none"/>
+  <path d="M274,298 L274,331 L382,331" stroke="#7c5cff" stroke-width="1.6" marker-end="url(#arp)" fill="none"/>
+
+  <!-- ============ HYBRID RETRIEVAL CONTAINER ============ -->
+  <rect x="40" y="392" width="1040" height="104" rx="12" fill="#0e1830" stroke="#243352"/>
+  <text x="58" y="414" fill="#5b8cff" font-size="11.5" font-weight="700" letter-spacing="1.2">HYBRID RETRIEVAL</text>
+
+  <g font-size="12.5" fill="#e8eefc" text-anchor="middle">
+    <rect x="60"  y="426" width="188" height="50" rx="9" fill="#111a2e" stroke="#2b6cb0"/>
+    <text x="154" y="447">Dense search</text><text x="154" y="463" font-size="11" fill="#9fc3ff">Qdrant · cosine</text>
+    <text x="256" y="457" font-size="20" fill="#5b8cff" font-weight="700">+</text>
+    <rect x="264" y="426" width="170" height="50" rx="9" fill="#111a2e" stroke="#2b6cb0"/>
+    <text x="349" y="447">BM25</text><text x="349" y="463" font-size="11" fill="#9fc3ff">keyword</text>
+    <rect x="470" y="426" width="150" height="50" rx="9" fill="#111a2e" stroke="#1e2b45"/>
+    <text x="545" y="447">RRF fusion</text><text x="545" y="463" font-size="11" fill="#8b9ac0">reciprocal rank</text>
+    <rect x="656" y="426" width="196" height="50" rx="9" fill="#111a2e" stroke="#1e2b45"/>
+    <text x="754" y="447">Cross-encoder</text><text x="754" y="463" font-size="11" fill="#8b9ac0">rerank</text>
+    <rect x="888" y="426" width="172" height="50" rx="9" fill="#12261c" stroke="#2f8f56"/>
+    <text x="974" y="447" fill="#a7e8c0">Top-k context</text>
+  </g>
+  <g stroke="#5b7099" stroke-width="1.6" marker-end="url(#ar)" fill="none">
+    <path d="M434,451 L468,451"/>
+    <path d="M620,451 L654,451"/>
+    <path d="M852,451 L886,451"/>
+  </g>
+  <!-- decompose -> retrieval -->
+  <path d="M508,358 L508,388" stroke="#7c5cff" stroke-width="1.6" marker-end="url(#arp)" fill="none"/>
+  <!-- qdrant store -> dense search (feeds retrieval) -->
+  <path d="M756,174 C756,300 154,300 154,424" stroke="#2b6cb0" stroke-width="1.6" stroke-dasharray="4 4" marker-end="url(#ar)" fill="none"/>
+
+  <!-- ============ GENERATION ROW ============ -->
+  <g font-size="13.5" fill="#e8eefc" text-anchor="middle">
+    <rect x="40"  y="540" width="236" height="58" rx="10" fill="#111a2e" stroke="#1e2b45"/>
+    <text x="158" y="566">Prompt</text><text x="158" y="584" font-size="11.5" fill="#8b9ac0">context + chat history</text>
+    <rect x="332" y="540" width="300" height="58" rx="10" fill="#151d38" stroke="#5b8cff"/>
+    <text x="482" y="566" fill="#9fc3ff" font-weight="700">LLM</text><text x="482" y="584" font-size="11.5" fill="#9fc3ff">Ollama · OpenAI · Anthropic</text>
+    <rect x="688" y="540" width="252" height="58" rx="10" fill="#12261c" stroke="#2f8f56"/>
+    <text x="814" y="566" fill="#a7e8c0" font-weight="700">Cited, streamed answer</text><text x="814" y="584" font-size="11.5" fill="#7fcf9f">[Source n] · SSE tokens</text>
+  </g>
+  <g stroke="#5b7099" stroke-width="1.6" marker-end="url(#ar)" fill="none">
+    <path d="M974,476 L974,512 L158,512 L158,538"/>
+    <path d="M276,569 L330,569"/>
+    <path d="M632,569 L686,569"/>
+  </g>
+  <!-- direct answer -> cited answer -->
+  <path d="M604,261 C900,261 814,420 814,538" stroke="#7c5cff" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arp)" fill="none"/>
+</svg>
