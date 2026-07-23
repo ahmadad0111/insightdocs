@@ -19,6 +19,8 @@ class QueryResponse(BaseModel):
     answer: str
     sources: List[Source]
     latency_ms: Optional[float] = None
+    route: Optional[str] = None            # "retrieve" | "direct"
+    sub_questions: Optional[List[str]] = None
 
 
 class DocumentInfo(BaseModel):

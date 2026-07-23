@@ -12,7 +12,8 @@ What makes it more than a demo:
 - **Evaluation harness** — quantitative retrieval **and** answer-quality metrics (context precision/recall, MRR, faithfulness, answer F1) with an A/B guide.
 - **Document management** — stable `document_id`s, **upsert-based updates** (re-uploading a file updates it in place), plus list / delete / reset.
 - **Provider-switchable LLM** — one env var swaps between local Ollama and OpenAI/Anthropic.
-- **Streaming web UI** — chat interface with token streaming, inline source citations, and drag-and-drop upload.
+- **Agentic layer** — a router answers greetings/meta directly (no wasted retrieval), and a decomposer splits complex questions into sub-questions, retrieves each, and merges the context before answering.
+- **Streaming web UI** — chat interface with token streaming, inline source citations, drag-and-drop upload, and a note when the agent decomposes a query.
 
 ## Architecture
 
@@ -68,6 +69,29 @@ uvicorn src.api.main:app --reload
 
 Queries accept an optional `document_ids` list to scope the search.
 
+## Agentic layer
+
+Enabled by default (`USE_AGENTIC=true`). Two behaviours sit in front of retrieval:
+
+1. **Router** (`src/rag/agentic/router.py`) — classifies each message as
+   `direct` (greeting / small talk / "what can you do?") or `retrieve`. Direct
+   messages are answered without touching the vector store. A confident
+   heuristic short-circuits the obvious cases; the LLM handles the rest.
+2. **Query decomposition** (`src/rag/agentic/decomposer.py`) — a complex,
+   multi-part question is split into focused sub-questions, each retrieved
+   separately, and their contexts merged and de-duplicated before a single
+   grounded answer is generated. Simple questions pass through untouched.
+
+Both fall back to deterministic behaviour if the LLM is unavailable, and the
+pure logic (routing rules, sub-question parsing, fusion) is unit-tested.
+
+Toggle it for an A/B in your evaluation:
+
+```bash
+USE_AGENTIC=false python -m eval.run_eval --eval eval/eval_set.json
+USE_AGENTIC=true  python -m eval.run_eval --eval eval/eval_set.json
+```
+
 ## Evaluation
 
 ```bash
@@ -108,6 +132,7 @@ src/
     embeddings/   embedder
     retrieval/    vector_store (doc mgmt), hybrid (BM25+dense+RRF), reranker
     generation/   llm (provider factory), rag_chain
+    agentic/      router, decomposer, agent (orchestrator)
     memory/       conversation_memory
   services/       document_ingestion_service, rag_service
 eval/             metrics, eval_set, run_eval
@@ -119,7 +144,7 @@ tests/            unit tests
 
 Built with a branch-per-feature workflow merged into `release/v1.0`:
 `feature/foundation` → `feature/doc-management` → `feature/retrieval-quality`
-→ `feature/evaluation` → `feature/frontend`.
+→ `feature/evaluation` → `feature/frontend` → `feature/agentic`.
 
 ## Roadmap
 

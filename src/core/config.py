@@ -44,6 +44,10 @@ class Config:
     CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "500"))
     CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "100"))
 
+    # --- Agentic ---
+    USE_AGENTIC = _as_bool("USE_AGENTIC", True)
+    MAX_SUBQUESTIONS = int(os.getenv("MAX_SUBQUESTIONS", "4"))
+
     # --- Conversation ---
     MAX_HISTORY_TURNS = int(os.getenv("MAX_HISTORY_TURNS", "5"))
 
@@ -56,6 +60,7 @@ class Config:
             "use_hybrid": cls.USE_HYBRID,
             "use_reranker": cls.USE_RERANKER,
             "llm_provider": cls.LLM_PROVIDER,
+            "use_agentic": cls.USE_AGENTIC,
         }
 
 
