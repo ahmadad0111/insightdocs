@@ -28,3 +28,12 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+
+
+# --- serve the web UI (optional, enabled when frontend/ exists) ---
+import os as _os
+from fastapi.staticfiles import StaticFiles as _StaticFiles
+
+_frontend_dir = _os.path.join(_os.path.dirname(__file__), "..", "..", "frontend")
+if _os.path.isdir(_frontend_dir):
+    app.mount("/app", _StaticFiles(directory=_frontend_dir, html=True), name="frontend")
