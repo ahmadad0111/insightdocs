@@ -1,115 +1,127 @@
-# Production RAG System
+# InsightDocs — Production RAG System
 
-A Retrieval-Augmented Generation (RAG) system built with FastAPI, Qdrant, Ollama, and Docker.
+A production-grade **Retrieval-Augmented Generation** system that answers
+questions over your PDFs with **grounded, cited answers**. Built with FastAPI,
+Qdrant, Sentence-Transformers, and a provider-switchable LLM layer
+(Ollama / OpenAI / Anthropic).
 
-## Features
+What makes it more than a demo:
 
-* PDF document ingestion
-* Automatic text chunking
-* Embedding generation using Sentence Transformers
-* Vector search with Qdrant
-* Local LLM inference with Ollama (Llama 3)
-* Retrieval-Augmented Generation (RAG)
-* FastAPI backend
-* Streaming responses using Server-Sent Events (SSE)
-* Docker Compose deployment
-* Source attribution for generated answers
+- **Hybrid retrieval** — dense vector search **+ BM25 keyword search**, fused with Reciprocal Rank Fusion.
+- **Cross-encoder reranking** — a supervised reranker reorders candidates for much higher precision.
+- **Evaluation harness** — quantitative retrieval **and** answer-quality metrics (context precision/recall, MRR, faithfulness, answer F1) with an A/B guide.
+- **Document management** — stable `document_id`s, **upsert-based updates** (re-uploading a file updates it in place), plus list / delete / reset.
+- **Provider-switchable LLM** — one env var swaps between local Ollama and OpenAI/Anthropic.
+- **Streaming web UI** — chat interface with token streaming, inline source citations, and drag-and-drop upload.
 
 ## Architecture
 
-PDF Documents
-→ Chunking
-→ Embeddings
-→ Qdrant Vector Store
-→ Retrieval
-→ Prompt Construction
-→ Ollama (Llama 3)
-→ Response Generation
+```
+                 ┌─────────────┐
+   PDF  ──▶ Load ─▶  Chunk  ─▶ Embed ─▶  Qdrant (vector store, per-doc metadata)
+                 └─────────────┘                       │
+                                                       ▼
+Question ─▶ Embed ─▶ Dense search ┐            ┌─ BM25 keyword search
+                                  ├─ RRF fusion ┤
+                                  ▼            └─────────────┐
+                          Cross-encoder rerank ─▶ Top-k context
+                                                       │
+                                                       ▼
+                              Prompt (context + history) ─▶ LLM ─▶ streamed, cited answer
+```
 
-## Project Structure
+## Quick start
 
+```bash
+cp .env.example .env          # then edit provider / keys
+
+# Option A — local, free (Ollama)
+docker compose --profile ollama up --build -d
+docker exec -it insightdocs-ollama ollama pull llama3
+
+# Option B — OpenAI/Anthropic (set LLM_PROVIDER + API key in .env)
+docker compose up --build -d
+```
+
+Open the UI at **http://localhost:8000/app**, upload a PDF, and ask away.
+
+### Run locally without Docker
+
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+# start Qdrant (docker run -p 6333:6333 qdrant/qdrant) and your LLM
+uvicorn src.api.main:app --reload
+```
+
+## API
+
+| Method | Path | Description |
+|---|---|---|
+| POST | `/documents` | Upload + index a PDF (re-upload updates in place) |
+| GET | `/documents` | List indexed documents |
+| DELETE | `/documents/{id}` | Delete one document |
+| DELETE | `/documents` | Reset the whole collection |
+| POST | `/query` | Ask a question → `{answer, sources, latency_ms}` |
+| POST | `/stream` | Same, streamed via Server-Sent Events |
+| GET | `/health`, `/version` | Health + config |
+
+Queries accept an optional `document_ids` list to scope the search.
+
+## Evaluation
+
+```bash
+python -m eval.run_eval --ingest data/raw/federated_learning.pdf
+python -m eval.run_eval --eval eval/eval_set.json
+```
+
+Prove the retrieval upgrades pay off by A/B-ing the flags:
+
+```bash
+USE_HYBRID=false USE_RERANKER=false python -m eval.run_eval --eval eval/eval_set.json
+USE_HYBRID=true  USE_RERANKER=true  python -m eval.run_eval --eval eval/eval_set.json
+```
+
+Drop the before/after numbers into this README and your resume. See `eval/README.md`.
+
+## Tests
+
+```bash
+pip install pytest
+pytest -q          # pure-logic unit tests (chunking, memory, fusion, metrics, prompt)
+```
+
+## Configuration
+
+All via environment variables — see `.env.example`. Highlights:
+`LLM_PROVIDER` (ollama|openai|anthropic), `EMBEDDING_MODEL`, `USE_HYBRID`,
+`USE_RERANKER`, `RERANKER_MODEL`, `TOP_K`, `CANDIDATE_K`.
+
+## Project structure
+
+```
 src/
-├── api/
-├── core/
-├── rag/
-│ ├── embeddings/
-│ ├── generation/
-│ └── retrieval/
-├── services/
-└── scripts/
-
-frontend/
-docker-compose.yml
-Dockerfile
-
-## Prerequisites
-
-* Docker
-* Docker Compose
-
-## Quick Start
-
-### Build and Start Services
-
-```bash
-docker-compose up --build
+  api/            FastAPI app factory, routes (health, query, documents), schemas, DI
+  core/           config + logging
+  rag/
+    ingestion/    pdf_loader, chunker
+    embeddings/   embedder
+    retrieval/    vector_store (doc mgmt), hybrid (BM25+dense+RRF), reranker
+    generation/   llm (provider factory), rag_chain
+    memory/       conversation_memory
+  services/       document_ingestion_service, rag_service
+eval/             metrics, eval_set, run_eval
+frontend/         streaming chat UI
+tests/            unit tests
 ```
 
-### Pull Llama 3
+## Development workflow
 
-```bash
-docker exec -it ollama bash
-ollama pull llama3
-```
+Built with a branch-per-feature workflow merged into `release/v1.0`:
+`feature/foundation` → `feature/doc-management` → `feature/retrieval-quality`
+→ `feature/evaluation` → `feature/frontend`.
 
-### API Documentation
+## Roadmap
 
-```text
-http://localhost:8000/docs
-```
-
-### Frontend
-
-Open:
-
-```text
-frontend/index.html
-```
-
-## API Endpoints
-
-### Query
-
-POST /query
-
-Request:
-
-```json
-{
-  "query": "What is federated learning?"
-}
-```
-
-### Streaming
-
-POST /stream
-
-Returns a streaming SSE response.
-
-## Current Limitations
-
-* Basic conversation memory
-* Vector retrieval only
-* No reranking
-* No query rewriting
-* Minimal frontend UI
-
-## Planned Improvements
-
-* Conversation-aware retrieval
-* Query rewriting
-* Hybrid search (BM25 + Vector)
-* Reranking
-* Enhanced frontend UI
-* Production monitoring
-* Cloud deployment
+Conversational memory upgrades, query decomposition / agentic routing,
+Redis caching with latency benchmarks, and optional LLM-judged RAGAS evaluation.
