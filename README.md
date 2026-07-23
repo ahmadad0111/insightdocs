@@ -1,5 +1,7 @@
 # InsightDocs — Production RAG System
 
+[![CI](https://github.com/ahmadad0111/insightdocs/actions/workflows/ci.yml/badge.svg)](https://github.com/ahmadad0111/insightdocs/actions/workflows/ci.yml)
+
 A production-grade **Retrieval-Augmented Generation** system that answers
 questions over your PDFs with **grounded, cited answers**. Built with FastAPI,
 Qdrant, Sentence-Transformers, and a provider-switchable LLM layer
@@ -17,6 +19,11 @@ What makes it more than a demo:
 
 ## Architecture
 
+![InsightDocs architecture](docs/architecture.svg)
+
+<details>
+<summary>ASCII version</summary>
+
 ```
                  ┌─────────────┐
    PDF  ──▶ Load ─▶  Chunk  ─▶ Embed ─▶  Qdrant (vector store, per-doc metadata)
@@ -30,6 +37,8 @@ Question ─▶ Embed ─▶ Dense search ┐            ┌─ BM25 keyword sea
                                                        ▼
                               Prompt (context + history) ─▶ LLM ─▶ streamed, cited answer
 ```
+
+</details>
 
 ## Quick start
 
