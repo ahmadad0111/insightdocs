@@ -8,6 +8,7 @@ from src.rag.retrieval.vector_store import VectorStore
 from src.rag.retrieval.hybrid import HybridRetriever
 from src.rag.generation.llm import get_llm
 from src.rag.generation.rag_chain import RAGChain
+from src.rag.agentic.agent import AgenticRAGChain
 from src.rag.memory.conversation_memory import ConversationMemory
 from src.services.rag_service import RAGService
 from src.services.document_ingestion_service import DocumentIngestionService
@@ -31,7 +32,11 @@ def build_pipeline():
 
     llm = get_llm()
     memory = ConversationMemory()
-    chain = RAGChain(embedder, vector_store, llm, memory, retriever=retriever)
+    if Config.USE_AGENTIC:
+        chain = AgenticRAGChain(embedder, vector_store, llm, memory, retriever=retriever)
+        logger.info("Using AgenticRAGChain (router + query decomposition)")
+    else:
+        chain = RAGChain(embedder, vector_store, llm, memory, retriever=retriever)
     service = RAGService(chain)
     ingestion = DocumentIngestionService(embedder=embedder, vector_store=vector_store)
     return {

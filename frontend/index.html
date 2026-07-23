@@ -53,6 +53,10 @@
   .chip b{color:var(--accent)}
   .empty{margin:auto;text-align:center;color:var(--muted);max-width:420px}
   .empty h1{font-size:1.5rem;color:var(--text);margin-bottom:8px}
+  .agentnote{align-self:flex-start;font-size:.74rem;color:var(--muted);
+    background:var(--panel-2);border:1px solid var(--border);border-radius:10px;
+    padding:6px 11px;max-width:760px}
+  .agentnote b{color:var(--accent-2)}
   form{display:flex;gap:10px;padding:16px 24px;border-top:1px solid var(--border);
     background:var(--panel-2)}
   #q{flex:1;background:var(--panel);border:1px solid var(--border);color:var(--text);
@@ -201,6 +205,11 @@ $("#chatForm").onsubmit = async (e)=>{
         let data; try{ data=JSON.parse(line);}catch(_){continue;}
         if(data.token){ answer+=data.token; bot.textContent=answer;
           messages.scrollTop=messages.scrollHeight; }
+        if(data.route && data.sub_questions && data.sub_questions.length){
+          const note=document.createElement('div'); note.className='agentnote';
+          note.innerHTML='<b>Agent</b> split this into: '+data.sub_questions.map(q=>'"'+q+'"').join(', ');
+          messages.insertBefore(note, bot);
+        }
         if(data.done){ renderSources(bot, data.sources); }
       }
     }
