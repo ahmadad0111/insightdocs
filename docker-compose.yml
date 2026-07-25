@@ -26,6 +26,8 @@ services:
     env_file:
       - path: .env
         required: false       # works without a .env; inline vars + code defaults apply
+    volumes:
+      - ./data:/app/data      # host PDFs visible to the container for --ingest
     environment:
       QDRANT_URL: http://qdrant:6333
       OLLAMA_URL: http://ollama:11434
