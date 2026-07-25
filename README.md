@@ -17,6 +17,12 @@ What makes it more than a demo:
 - **Agentic layer** — a router answers greetings/meta directly (no wasted retrieval), and a decomposer splits complex questions into sub-questions, retrieves each, and merges the context before answering.
 - **Streaming web UI** — chat interface with token streaming, inline source citations, drag-and-drop upload, and a note when the agent decomposes a query.
 
+## Demo
+
+Ask a question and get a streamed, grounded answer with inline source citations:
+
+![InsightDocs demo — grounded answer with citations](docs/demo.png)
+
 ## Architecture
 
 ![InsightDocs architecture](docs/architecture.svg)
