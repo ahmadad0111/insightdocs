@@ -1,26 +1,41 @@
 {
   "document": "federated_learning.pdf",
-  "description": "Hand-written Q&A pairs over the sample federated-learning paper. Replace/extend with pairs for your own corpus. relevant_pages is optional ground truth for retrieval metrics.",
+  "description": "Q&A pairs grounded in 'Towards Federated Learning at Scale: System Design' (Bonawitz et al.). relevant_pages are the actual pages where each answer appears. Replace with your own corpus to evaluate other documents.",
   "items": [
     {
-      "question": "What problem does federated learning address?",
-      "reference_answer": "Federated learning trains a shared model across many clients without moving their raw data to a central server, preserving privacy.",
-      "relevant_pages": [1, 2]
+      "question": "What is Federated Learning?",
+      "reference_answer": "Federated Learning is a distributed machine learning approach that enables model training on a large corpus of decentralized data, keeping the data on users' devices instead of collecting it centrally.",
+      "relevant_pages": [1]
     },
     {
-      "question": "What is the main challenge under non-IID data?",
-      "reference_answer": "When client data distributions differ (non-IID), local updates diverge and the aggregated global model converges slowly or to a worse optimum.",
+      "question": "What are the three phases of each round in the federated learning protocol?",
+      "reference_answer": "Each round has three phases: Selection, Configuration, and Reporting. Devices check in and are selected, the server configures and sends the model and plan, and devices train locally and report updates back.",
       "relevant_pages": [2, 3]
     },
     {
-      "question": "How does the method reduce communication cost?",
-      "reference_answer": "By using second-order (Hessian) information to weight aggregation, it needs fewer communication rounds to reach a target accuracy.",
-      "relevant_pages": [3, 4]
+      "question": "Which algorithm does the server use to aggregate the model updates from devices?",
+      "reference_answer": "The server aggregates the reported device updates using Federated Averaging.",
+      "relevant_pages": [3]
     },
     {
-      "question": "What baseline is the approach compared against?",
-      "reference_answer": "It is compared against FedAvg, the standard federated averaging baseline.",
-      "relevant_pages": [4, 5]
+      "question": "Under what conditions does on-device training run to avoid harming the user experience?",
+      "reference_answer": "On-device training runs only when the phone is idle, charging, and connected to an unmetered network such as WiFi, to avoid impacting user experience, data usage, and battery life.",
+      "relevant_pages": [4]
+    },
+    {
+      "question": "What are the main actor types in the FL server architecture?",
+      "reference_answer": "The server architecture uses Coordinators, Master Aggregators, Aggregators, and Selectors. Coordinators orchestrate tasks, Master Aggregators manage rounds, and Selectors accept and forward device connections.",
+      "relevant_pages": [5]
+    },
+    {
+      "question": "What is Secure Aggregation and what protection does it provide?",
+      "reference_answer": "Secure Aggregation is a Secure Multi-Party Computation protocol that uses encryption so individual device updates are uninspectable by the server, which only sees the aggregated sum. It is deployed as a privacy enhancement.",
+      "relevant_pages": [6]
+    },
+    {
+      "question": "What machine learning framework is the federated learning system built on?",
+      "reference_answer": "The system is built on TensorFlow.",
+      "relevant_pages": [1, 7]
     },
     {
       "question": "What is the capital of France?",
