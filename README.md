@@ -109,6 +109,8 @@ USE_AGENTIC=true  python -m eval.run_eval --eval eval/eval_set.json
 
 ## Evaluation
 
+> The eval set is grounded in the sample paper *"Towards Federated Learning at Scale: System Design"* (Bonawitz et al., MLSys 2019, [arXiv:1902.01046](https://arxiv.org/abs/1902.01046)). The PDF is not committed; download it with `curl -L -o data/raw/federated_learning.pdf https://arxiv.org/pdf/1902.01046` (see `data/raw/README.md`).
+
 ```bash
 python -m eval.run_eval --ingest data/raw/federated_learning.pdf
 python -m eval.run_eval --eval eval/eval_set.json
